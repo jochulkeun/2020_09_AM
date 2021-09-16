@@ -13,19 +13,20 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.sbs.java.am.util.DBUtil;
+import com.sbs.java.am.util.SecSql;
 
 @WebServlet("/article/detail")
 public class ArticleDetailServlet extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-
 		response.setContentType("text/html; charset=UTF-8");
 
 		String url = "jdbc:mysql://localhost:3306/am?serverTimezone=Asia/Seoul&useOldAliasMetadataBehavior=true&zeroDateTimeBehavior=convertToNull";
 		String user = "root";
 		String password = "";
 
+		// 커넥터 드라이버 활성화
 		String driverName = "com.mysql.cj.jdbc.Driver";
 
 		try {
@@ -36,34 +37,30 @@ public class ArticleDetailServlet extends HttpServlet {
 			return;
 		}
 
-		Connection conn = null;
+		// DB 연결
+		Connection con = null;
 
 		try {
-			conn = DriverManager.getConnection(url, user, password);
-
+			con = DriverManager.getConnection(url, user, password);
 			int id = Integer.parseInt(request.getParameter("id"));
 
-			String sql = String.format("SELECT * FROM article WHERE id = %d", id);
-			Map<String, Object> articleRow = DBUtil.selectRow(conn, sql);
+			SecSql sql = SecSql.from("SELECT *");
+			sql.append("FROM article");
+			sql.append("WHERE id = ?", id);
 
-			response.getWriter().append(articleRow.toString());
-
+			Map<String, Object> articleRow = DBUtil.selectRow(con, sql);
 			request.setAttribute("articleRow", articleRow);
 			request.getRequestDispatcher("/jsp/article/detail.jsp").forward(request, response);
-
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
-			if (conn != null) {
+			if (con != null) {
 				try {
-					conn.close();
+					con.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
-
 				}
 			}
 		}
-
 	}
-
 }
