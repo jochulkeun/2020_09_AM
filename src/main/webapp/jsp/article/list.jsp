@@ -13,7 +13,7 @@ int totalpage = (int)request.getAttribute("totalpage");
 <meta charset="EUC-KR">
 <title>게시물 리스트</title>
 </head>
-<body>
+<body> 
 	<h1>게시물 리스트</h1>
 		
 	<table border="1">
