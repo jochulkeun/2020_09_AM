@@ -1,3 +1,4 @@
+#DB 삭제/생성/사용
 DROP DATABASE IF EXISTS am;
 CREATE DATABASE am;
 USE am;
@@ -26,4 +27,15 @@ SET regDate = NOW(),
 title = '제목3',
 `body` = '내용3';
 
+INSERT INTO article 
+SET regDate = NOW(),
+title = '제목4',
+`body` = '내용4';
+
 SELECT * FROM article;
+
+SELECT COUNT(*) FROM article;
+
+INSERT INTO article (regDate,title,`body`)
+SELECT NOW(),CONCAT('제목_',RAND()),CONCAT('내용_',RAND())
+FROM article;
