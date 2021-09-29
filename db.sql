@@ -10,6 +10,16 @@ CREATE TABLE article(
     title CHAR(255) NOT NULL,
     `body` LONGTEXT NOT NULL
 );
+DROP TABLE `member`;
+CREATE TABLE `member`(
+    id INT(10) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    regDate DATETIME NOT NULL,
+    loginId CHAR(100) NOT NULL UNIQUE,
+    loginPw CHAR(100) NOT NULL ,
+    `name` CHAR(50) NOT NULL
+    );
+SELECT * FROM `member`;
+
 
 # 게시물 데이터 추가 
 INSERT INTO article 
@@ -34,8 +44,8 @@ title = '제목4',
 
 SELECT * FROM article;
 
-SELECT COUNT(*) FROM article;
+select count(*) FROM article;
 
-INSERT INTO article (regDate,title,`body`)
-SELECT NOW(),CONCAT('제목_',RAND()),CONCAT('내용_',RAND())
+insert into article (regDate,title,`body`)
+select now(),concat('제목_',rand()),CONCAT('내용_',RAND())
 FROM article;

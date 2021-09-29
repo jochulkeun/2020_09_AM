@@ -10,6 +10,7 @@
 	<h1>메인페이지</h1>
 	
 	<div><a href="../article/list">게시물 리스트</a></div>
+	<div><a href="../article/Join">회원가입</a></div>
 	
 </body>
 </html>
