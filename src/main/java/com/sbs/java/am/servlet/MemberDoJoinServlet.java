@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -16,8 +15,9 @@ import com.sbs.java.am.Config.Config;
 import com.sbs.java.am.util.DBUtil;
 import com.sbs.java.am.util.SecSql;
 
-@WebServlet("/article/doJoin")
-public class ArticleDoJoinServlet extends HttpServlet {
+@WebServlet("/member/doJoin")
+public class MemberDoJoinServlet extends HttpServlet {
+
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -41,20 +41,19 @@ public class ArticleDoJoinServlet extends HttpServlet {
 
 		try {
 			con = DriverManager.getConnection(Config.getDBUrl(), Config.getDBId(), Config.getDBPw());
-
 			String loginId = request.getParameter("loginId");
 			String loginPw = request.getParameter("loginPw");
 			String name = request.getParameter("name");
 
-			SecSql sql = SecSql.from("INSERT INTO `member`");
+			SecSql sql = SecSql.from("INSERT INTO member");
 			sql.append("SET regDate = NOW()");
-			sql.append(",loginId = ?", loginId);
-			sql.append(",loginPw = ?", loginPw);
-			sql.append(",`name` = ?",name);
+			sql.append(", loginId = ?", loginId);
+			sql.append(", loginPw = ?", loginPw);
+			sql.append(", `name` = ?", name);
 
 			int id = DBUtil.insert(con, sql);
-			response.getWriter()
-					.append(String.format("<script>alert('%s님 환영합니다.'); location.replace('list');</script>", name));
+			response.getWriter().append(
+					String.format("<script> alert('%d번 회원이 가입되었습니다.'); location.replace('../home/main'); </script>", id));
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -67,9 +66,10 @@ public class ArticleDoJoinServlet extends HttpServlet {
 			}
 		}
 	}
+
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException{
-		doGet(request,response);
+			throws ServletException, IOException {
+		doGet(request, response);
 	}
 }
