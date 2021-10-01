@@ -54,7 +54,7 @@ public class MemberDoJoinServlet extends HttpServlet {
 			if(isLoginIdDup == true) {
 				
 				response.getWriter().append(
-						String.format("<script> alert('존재하는 아이디 입니다.'); location.replace('../member/Join'); </script>"));
+						String.format("<script> alert('존재하는 아이디 입니다.'); history.back(); </script>"));
 				
 				return;
 			}
