@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.sbs.java.am.Config.Config;
+import com.sbs.java.am.exception.SQLErrorException;
 import com.sbs.java.am.util.DBUtil;
 import com.sbs.java.am.util.SecSql;
 
@@ -51,7 +52,11 @@ public class ArticleDeleteServlet extends HttpServlet {
 					.append(String.format("<script>alert('%d번글이 삭제 되었습니다.'); location.replace('list');</script>", id));
 		} catch (SQLException e) {
 			e.printStackTrace();
-		} finally {
+		}
+			catch(SQLErrorException e) {
+				e.getOrigin().printStackTrace();
+			}
+		 finally {
 			if (con != null) {
 				try {
 					con.close();

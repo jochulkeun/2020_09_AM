@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.sbs.java.am.Config.Config;
+import com.sbs.java.am.exception.SQLErrorException;
 import com.sbs.java.am.util.DBUtil;
 import com.sbs.java.am.util.SecSql;
 
@@ -23,7 +24,6 @@ public class ArticleDoWriteServlet extends HttpServlet {
 			throws ServletException, IOException {
 		request.setCharacterEncoding("UTF-8");
 		response.setContentType("text/html; charset=UTF-8");
-
 
 		// 커넥터 드라이버 활성화
 		String driverName = Config.getDBDriverClassName();
@@ -55,6 +55,8 @@ public class ArticleDoWriteServlet extends HttpServlet {
 					.append(String.format("<script>alert('%d번글이 생성 되었습니다.'); location.replace('list');</script>", id));
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} catch (SQLErrorException e) {
+			e.getOrigin().printStackTrace();
 		} finally {
 			if (con != null) {
 				try {
@@ -65,9 +67,10 @@ public class ArticleDoWriteServlet extends HttpServlet {
 			}
 		}
 	}
+
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException{
-		doGet(request,response);
+			throws ServletException, IOException {
+		doGet(request, response);
 	}
 }

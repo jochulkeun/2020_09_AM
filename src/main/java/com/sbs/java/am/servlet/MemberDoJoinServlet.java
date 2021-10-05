@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.sbs.java.am.Config.Config;
+import com.sbs.java.am.exception.SQLErrorException;
 import com.sbs.java.am.util.DBUtil;
 import com.sbs.java.am.util.SecSql;
 
@@ -23,7 +24,6 @@ public class MemberDoJoinServlet extends HttpServlet {
 			throws ServletException, IOException {
 		request.setCharacterEncoding("UTF-8");
 		response.setContentType("text/html; charset=UTF-8");
-
 
 		// 커넥터 드라이버 활성화
 		String driverName = Config.getDBDriverClassName();
@@ -44,22 +44,21 @@ public class MemberDoJoinServlet extends HttpServlet {
 			String loginId = request.getParameter("loginId");
 			String loginPw = request.getParameter("loginPw");
 			String name = request.getParameter("name");
-			
+
 			SecSql sql = SecSql.from("SELECT COUNT(*) > 0");
 			sql.append("FROM `member`");
-			sql.append("WHERE loginId =?",loginId);
-			
+			sql.append("WHERE loginId =?", loginId);
+
 			boolean isLoginIdDup = DBUtil.selectRowBooleanValue(con, sql);
-			
-			if(isLoginIdDup == true) {
-				
-				response.getWriter().append(
-						String.format("<script> alert('존재하는 아이디 입니다.'); history.back(); </script>"));
-				
+
+			if (isLoginIdDup == true) {
+
+				response.getWriter()
+						.append(String.format("<script> alert('존재하는 아이디 입니다.'); history.back(); </script>"));
+
 				return;
 			}
-			
-			
+
 			sql = SecSql.from("INSERT INTO member");
 			sql.append("SET regDate = NOW()");
 			sql.append(", loginId = ?", loginId);
@@ -67,10 +66,12 @@ public class MemberDoJoinServlet extends HttpServlet {
 			sql.append(", `name` = ?", name);
 
 			int id = DBUtil.insert(con, sql);
-			response.getWriter().append(
-					String.format("<script> alert('%d번 회원이 가입되었습니다.'); location.replace('../home/main'); </script>", id));
+			response.getWriter().append(String
+					.format("<script> alert('%d번 회원이 가입되었습니다.'); location.replace('../home/main'); </script>", id));
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} catch (SQLErrorException e) {
+			e.getOrigin().printStackTrace();
 		} finally {
 			if (con != null) {
 				try {

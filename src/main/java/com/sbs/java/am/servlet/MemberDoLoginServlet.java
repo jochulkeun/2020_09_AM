@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -12,19 +11,21 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.sbs.java.am.Config.Config;
 import com.sbs.java.am.exception.SQLErrorException;
 import com.sbs.java.am.util.DBUtil;
 import com.sbs.java.am.util.SecSql;
 
-@WebServlet("/article/list")
-public class ArticleListServlet extends HttpServlet {
+@WebServlet("/member/doLogin")
+public class MemberDoLoginServlet extends HttpServlet {
+
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		request.setCharacterEncoding("UTF-8");
 		response.setContentType("text/html; charset=UTF-8");
-
 
 		// 커넥터 드라이버 활성화
 		String driverName = Config.getDBDriverClassName();
@@ -42,50 +43,38 @@ public class ArticleListServlet extends HttpServlet {
 
 		try {
 			con = DriverManager.getConnection(Config.getDBUrl(), Config.getDBId(), Config.getDBPw());
+			String loginId = request.getParameter("loginId");
+			String loginPw = request.getParameter("loginPw");
 
-			int page =1;
-			
-			if(request.getParameter("page") != null && request.getParameter("page").length() !=0) {
-				try {
-				
-					page = Integer.parseInt(request.getParameter("page"));
-					
-				}
-				catch(NumberFormatException e) {
-					
-				}
+			SecSql sql = SecSql.from("SELECT * ");
+			sql.append("FROM `member`");
+			sql.append("WHERE loginId = ?", loginId);
+
+			Map<String,Object> memberRow= DBUtil.selectRow(con, sql);
+
+			if (memberRow.isEmpty()) {
+
+				response.getWriter().append(String.format("<script> alert('존재하지 않는 회원입니다.'); history.back(); </script>"));
+
+				return;
 			}
-			int itemsInAPage = 20;
-			int limitFrom = (page - 1) * itemsInAPage;
 			
-			SecSql sql = SecSql.from("SELECT COUNT(*) AS cnt");
-			sql.append("FROM article");
-			
-			
-			int totalCount = DBUtil.selectRowIntValue(con, sql);
-			
-			int totalpage = (int)Math.ceil((double)totalCount/itemsInAPage);
-			
-			sql = SecSql.from("SELECT *");
-			sql.append("FROM article");
-			sql.append("ORDER BY id DESC");
-			sql.append("LIMIT ?,?",limitFrom,itemsInAPage);
+			if(((String)memberRow.get("loginPw")).equals(loginPw) == false){
+				response.getWriter().append(String.format("<script> alert('비밀번호가 일치하지 않습니다.'); history.back(); </script>"));
 
+				return;
+			}
 			
-			System.out.println(sql);
+			HttpSession session = request.getSession();
+			session.setAttribute("loginedMemberId", memberRow.get("id"));
 			
-			List<Map<String, Object>> articleRows = DBUtil.selectRows(con, sql);
-			request.setAttribute("articleRows", articleRows);
-			request.setAttribute("page",page);
-			request.setAttribute("totalpage",totalpage);
-			request.getRequestDispatcher("/jsp/article/list.jsp").forward(request, response);
+			response.getWriter().append(String.format("<script> alert('로그인 성공!'); location.replace('../home/main'); </script>"));
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
-			}
-			catch(SQLErrorException e) {
-				e.getOrigin().printStackTrace();
-			}
-		finally {
+		} catch (SQLErrorException e) {
+			e.getOrigin().printStackTrace();
+		} finally {
 			if (con != null) {
 				try {
 					con.close();
