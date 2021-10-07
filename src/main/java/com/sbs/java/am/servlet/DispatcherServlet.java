@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -13,26 +14,18 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.sbs.java.am.Config.Config;
+import com.sbs.java.am.controller.ArticleController;
 import com.sbs.java.am.exception.SQLErrorException;
 import com.sbs.java.am.util.DBUtil;
 import com.sbs.java.am.util.SecSql;
 
-@WebServlet("/article/doWrite")
-public class ArticleDoWriteServlet extends HttpServlet {
+@WebServlet("/s/*")
+public class DispatcherServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		request.setCharacterEncoding("UTF-8");
 		response.setContentType("text/html; charset=UTF-8");
-		
-		HttpSession session = request.getSession();
-		
-		if(session.getAttribute("loginedMemberId")==null) {
-			response.getWriter()
-			.append(String.format("<script>alert('로그인후 이용해주세요'); location.replace('../member/Login');</script>"));
-		
-			return;
-		}
 
 		// 커넥터 드라이버 활성화
 		String driverName = Config.getDBDriverClassName();
@@ -50,23 +43,46 @@ public class ArticleDoWriteServlet extends HttpServlet {
 
 		try {
 			con = DriverManager.getConnection(Config.getDBUrl(), Config.getDBId(), Config.getDBPw());
+			//모든 요청에 들어가기 전에 무조건 해줘야 하는 일
+			HttpSession session = request.getSession();
 
-			String title = request.getParameter("title");
-			String body = request.getParameter("body");
-			
-			
-			
-			int loginedMemberId = (int)session.getAttribute("loginedMemberId");
+			boolean isLogined = false;
+			int loginedMemberId = -1;
+			Map<String, Object> loginedMemberRow = null;
 
-			SecSql sql = SecSql.from("INSERT INTO article ");
-			sql.append("SET regDate = NOW()");
-			sql.append(",title = ?", title);
-			sql.append(",`body` = ?", body);
-			sql.append(",memberId = ?", loginedMemberId);
+			if (session.getAttribute("loginedMemberId") != null) {
+				loginedMemberId = (int) session.getAttribute("loginedMemberId");
+				isLogined = true;
 
-			int id = DBUtil.insert(con, sql);
-			response.getWriter()
-					.append(String.format("<script>alert('%d번글이 생성 되었습니다.'); location.replace('list');</script>", id));
+				SecSql sql = SecSql.from("SELECT * FROM `member`");
+				sql.append("WHERE id = ?", loginedMemberId);
+				loginedMemberRow = DBUtil.selectRow(con, sql);
+			}
+
+			request.setAttribute("isLogined", isLogined);
+			request.setAttribute("loginedMemberId", loginedMemberId);
+			request.setAttribute("loginedMemberRow", loginedMemberRow);
+			
+			//모든 요청에 들어가기 전에 무조건 해줘야 하는 일
+			
+			String requestUri = request.getRequestURI();
+			String[] requestUriBits = requestUri.split("/");
+
+			if (requestUriBits.length < 5) {
+				response.getWriter().append("올바른 요청이 아닙니다.");
+				return;
+			}
+			String controllerName = requestUriBits[3];
+			String actionMethodName = requestUriBits[4];
+
+			if (controllerName.equals("article")) {
+				ArticleController controller = new ArticleController(request, response, con);
+
+				if (actionMethodName.equals("list")) {
+					controller.actionList();
+				}
+			}
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} catch (SQLErrorException e) {

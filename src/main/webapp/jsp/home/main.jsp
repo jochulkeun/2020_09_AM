@@ -1,36 +1,25 @@
-<%@ page language="java" contentType="text/html; charset=EUC-KR"
-    pageEncoding="EUC-KR"%>
-    <%
-    boolean isLogined = (boolean)request.getAttribute("isLogined");
-    int loginedMemberId = (int)request.getAttribute("loginedMemberId");
-    %>
+<%@page import="java.util.List"%>
+<%@page import="java.util.Map"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+
+
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="EUC-KR">
-<title>¸ÞÀÎÆäÀÌÁö</title>
+<meta charset="UTF-8">
+<title>ë©”ì¸íŽ˜ì´ì§€</title>
 </head>
 <body>
-	<h1>¸ÞÀÎÆäÀÌÁö</h1>
+
+	<h1>ë©”ì¸íŽ˜ì´ì§€</h1>
 	
-	<%
-	if(isLogined)
-	{%>
-		<div>
-		<%=loginedMemberId %>¹ø È¸¿ø´Ô È¯¿µÇÕ´Ï´Ù.
-		<a href="../member/doLogout">·Î±×¾Æ¿ô</a>
-		</div>
-	<%}%>
 	
-	<%
-	if(!isLogined)
-	{%>
-		<div><a href="../member/Login">·Î±×ÀÎ</a>
-		</div>
-	<%}%>
+
+<%@ include file = "../part/topBar.jspf" %>
+
 	
-	<div><a href="../article/list">°Ô½Ã¹° ¸®½ºÆ®</a></div>
-	<div><a href="../member/Join">È¸¿ø°¡ÀÔ</a></div>
+		
 	
 </body>
 </html>

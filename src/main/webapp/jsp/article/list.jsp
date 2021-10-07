@@ -1,7 +1,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
-<%@ page language="java" contentType="text/html; charset=EUC-KR"
-    pageEncoding="EUC-KR"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
 <%
 List<Map<String,Object>> articleRows = (List<Map<String,Object>>)request.getAttribute("articleRows");
 int cPage = (int)request.getAttribute("page");
@@ -10,14 +10,14 @@ int totalpage = (int)request.getAttribute("totalpage");
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="EUC-KR">
-<title>°Ô½Ã¹° ¸®½ºÆ®</title>
+<meta charset="UTF-8">
+<title>ê²Œì‹œë¬¼ ë¦¬ìŠ¤íŠ¸</title>
 </head>
 <body> 
-	<h1>°Ô½Ã¹° ¸®½ºÆ®</h1>
-		
+	<h1>ê²Œì‹œë¬¼ ë¦¬ìŠ¤íŠ¸</h1>
+		<%@ include file = "../part/topBar.jspf" %>
 		<div>
-			<a href="write">°Ô½Ã¹° ÀÛ¼º</a>
+			<a href="write">ê²Œì‹œë¬¼ ìž‘ì„±</a>
 		</div>
 		
 	<table border="1">
@@ -28,11 +28,11 @@ int totalpage = (int)request.getAttribute("totalpage");
 	</colgroup> -->
  	<thead>
 		<tr>
-			<th>¹øÈ£</th>
-			<th>³¯Â¥</th>
-			<th>Á¦¸ñ</th>
-			<th>¼öÁ¤</th>
-			<th>»èÁ¦</th>
+			<th>ë²ˆí˜¸</th>
+			<th>ë‚ ì§œ</th>
+			<th>ì œëª©</th>
+			<th>ìˆ˜ì •</th>
+			<th>ì‚­ì œ</th>
 		</tr>
 		</thead>
 		<tbody>
@@ -43,8 +43,8 @@ int totalpage = (int)request.getAttribute("totalpage");
 				<td><%=articleRow.get("id") %></td>
 				<td><%=articleRow.get("regDate") %></td>
 				<td><a href="detail?id=<%=articleRow.get("id") %>"><%=articleRow.get("title") %></a></td>
-				<td><a href="modify?id=<%=articleRow.get("id") %>">¼öÁ¤</a></td>
-				<td><a href="doDelete?id=<%=articleRow.get("id") %>">»èÁ¦</a></td>
+				<td><a href="modify?id=<%=articleRow.get("id") %>">ìˆ˜ì •</a></td>
+				<td><a href="doDelete?id=<%=articleRow.get("id") %>">ì‚­ì œ</a></td>
 				
 			</tr>
 			</tbody>
@@ -59,7 +59,7 @@ int totalpage = (int)request.getAttribute("totalpage");
 	<div class="page">
 		<%if (cPage > 1){
 			%>
-		<a href="list?page=1">¢¸¢¸</a>
+		<a href="list?page=1">â—€â—€</a>
 		<%}%>
 		
 		<%int pageMenuSize = 5;
@@ -80,7 +80,7 @@ int totalpage = (int)request.getAttribute("totalpage");
 		<%} %>
 		<%if(cPage < totalpage){
 			%>
-		<a href="list?page=<%=totalpage%>">¢º¢º</a>
+		<a href="list?page=<%=totalpage%>">â–¶â–¶</a>
 		<%}%>
 	</div>
 </body>

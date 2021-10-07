@@ -20,6 +20,10 @@ CREATE TABLE `member`(
     );
 SELECT * FROM `member`;
 
+SELECT *
+FROM `member`
+WHERE loginId = loginId;
+
 
 # 게시물 데이터 추가 
 INSERT INTO article 
@@ -42,10 +46,36 @@ SET regDate = NOW(),
 title = '제목4',
 `body` = '내용4';
 
+INSERT INTO `member`
+SET regDate = NOW(),
+loginId = 'test1',
+loginPw = 'test1',
+`name` = '홍길동';
+
+INSERT INTO `member`
+SET regDate = NOW(),
+loginId = 'test2',
+loginPw = 'test2',
+`name` = '홍길순';
+
+INSERT INTO `member`
+SET regDate = NOW(),
+loginId = 'admin',
+loginPw = 'admin',
+`name` = 'admin';
+
+#게시물 테이블에 memberId칼럼 추가
+ALTER TABLE `article` ADD COLUMN memberId INT(10) UNSIGNED NOT NULL AFTER regDate ;
+
 SELECT * FROM article;
 
-select count(*) FROM article;
+UPDATE article
+SET memberId = 2
+WHERE memberId = 0;
 
-insert into article (regDate,title,`body`)
-select now(),concat('제목_',rand()),CONCAT('내용_',RAND())
+SELECT COUNT(*) FROM article;
+
+INSERT INTO article (regDate,title,`body`)
+SELECT NOW(),CONCAT('제목_',RAND()),CONCAT('내용_',RAND())
 FROM article;
+
